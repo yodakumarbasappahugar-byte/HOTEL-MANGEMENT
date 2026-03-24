@@ -41,4 +41,30 @@
 
 ---
 
+### Step 3: Frontend & Backend Initialization ✅
+**Date**: 2026-03-24
+
+- Initialized Next.js frontend with premium aesthetic vanilla CSS. Created Index page with Sign In/Sign Up buttons.
+- Initialized FastAPI backend and configured Render deployment (`hotel-management-backend`).
+- Set up GitHub repository and pushed code automatically.
+- Created `users` table schema in Neon PostgreSQL.
+
+### Step 4: Deployment ✅
+**Date**: 2026-03-24
+
+- Render Backend Web Service created via API.
+- Next.js Frontend deployed to Vercel via CLI.
+
+---
+
+### Step 5: Service Integrations & Links ✅
+**Date**: 2026-03-24
+
+- **Render ↔ GitHub**: Linked repository `yodakumarbasappahugar-byte/HOTEL-MANGEMENT` for automatic deployment.
+- **Render ↔ Neon**: Added PostgreSQL `DATABASE_URL` connected using secure string.
+- **Vercel ↔ Render**: Added `NEXT_PUBLIC_API_URL` pointing to the Render backend URL.
+- **Vercel ↔ GitHub (Action Required)**: The Vercel account needs a GitHub Login Connection to enable CLI repository setups (`https://vercel.com/docs/accounts/create-an-account#login-methods-and-connections`). Once done, we can link it easily.
+
+---
+
 *More steps will be added below as we finalize each phase.*
