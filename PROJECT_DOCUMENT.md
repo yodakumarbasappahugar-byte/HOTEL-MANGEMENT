@@ -1,4 +1,4 @@
-# Hotel Management System — Project Document
+# Ayodhdya Hotel — Project Document
 
 > **Project Start Date**: 2026-03-23
 > **Stack**: Next.js (Vercel) + FastAPI (Render) + PostgreSQL (Neon)
@@ -63,7 +63,16 @@
 - **Render ↔ GitHub**: Linked repository `yodakumarbasappahugar-byte/HOTEL-MANGEMENT` for automatic deployment.
 - **Render ↔ Neon**: Added PostgreSQL `DATABASE_URL` connected using secure string.
 - **Vercel ↔ Render**: Added `NEXT_PUBLIC_API_URL` pointing to the Render backend URL.
-- **Vercel ↔ GitHub (Action Required)**: The Vercel account needs a GitHub Login Connection to enable CLI repository setups (`https://vercel.com/docs/accounts/create-an-account#login-methods-and-connections`). Once done, we can link it easily.
+- **Vercel ↔ GitHub (Action Required)**: The Vercel account needs a GitHub Login Connection to enable CLI repository setups.
+
+### Step 6: Premium UI Rebranding & Carousel ✅
+**Date**: 2026-03-34
+
+- **Rebranding**: Renamed application from "LuxeStays" to "**Ayodhdya Hotel**" across all pages.
+- **Authentication Pages**: Built custom **Sign In** and **Sign Up** pages with premium glassmorphism aesthetic.
+- **Action Buttons**: Updated all primary buttons to a sleek **Black** color scheme.
+- **Hero Carousel**: Implemented a modern, high-quality image carousel on the landing page featuring luxury hotel exteriors, suites, and infinity pools.
+- **Manual Verification**: Final manual deployment pushed to Vercel production.
 
 ---
 
