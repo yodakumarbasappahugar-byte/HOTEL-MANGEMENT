@@ -30,6 +30,17 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class Room(Base):
+    __tablename__ = "rooms"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    room_type = Column(String(50), nullable=False)
+    price_per_night = Column(Integer, nullable=False)
+    description = Column(String(500))
+    image_url = Column(String(255))
+    is_available = Column(String(20), default="Available")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 # Pydantic Schemas
 class UserCreate(BaseModel):
     name: str  # We'll use this as username
@@ -45,6 +56,18 @@ class UserResponse(BaseModel):
     username: str
     email: str
     created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class RoomResponse(BaseModel):
+    id: int
+    name: str
+    room_type: str
+    price_per_night: int
+    description: str
+    image_url: str
+    is_available: str
 
     class Config:
         from_attributes = True
@@ -113,6 +136,47 @@ async def api_status():
         "status": "online",
         "database": "connected"
     }
+
+@app.get("/api/rooms", response_model=List[RoomResponse])
+async def get_rooms(db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import select
+    result = await db.execute(select(Room))
+    return result.scalars().all()
+
+@app.post("/api/rooms/seed")
+async def seed_rooms(db: AsyncSession = Depends(get_db)):
+    # Check if rooms already exist
+    from sqlalchemy import select
+    result = await db.execute(select(Room))
+    if result.scalars().first():
+        return {"message": "Rooms already seeded"}
+    
+    rooms = [
+        Room(
+            name="Luxury Sunset Suite",
+            room_type="Luxury Suite",
+            price_per_night=1200,
+            description="Ultra-luxury suite with floor-to-ceiling windows and panoramic city views.",
+            image_url="/images/suite_luxury.png"
+        ),
+        Room(
+            name="Deluxe Ocean View",
+            room_type="Deluxe Room",
+            price_per_night=650,
+            description="Contemporary room with a private balcony and stunning ocean vistas.",
+            image_url="/images/suite_deluxe.png"
+        ),
+        Room(
+            name="Royal Presidential Suite",
+            room_type="Presidential Suite",
+            price_per_night=2500,
+            description="Grandest suite with private infinity pool and opulent marble finishings.",
+            image_url="/images/suite_presidential.png"
+        )
+    ]
+    db.add_all(rooms)
+    await db.commit()
+    return {"message": "Rooms seeded successfully"}
 
 # Table creation (utility)
 @app.on_event("startup")

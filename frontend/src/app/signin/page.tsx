@@ -28,7 +28,7 @@ export default function SignIn() {
 
       if (response.ok) {
         localStorage.setItem('user', JSON.stringify(data.user));
-        router.push('/user-dashboard');
+        router.push('/dashboard');
       } else {
         setError(data.detail || 'Sign in failed');
       }
