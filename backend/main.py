@@ -97,6 +97,10 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
+@app.get("/api/ping")
+async def ping():
+    return {"status": "alive", "timestamp": datetime.utcnow()}
+
 @app.get("/")
 async def root():
     return {"message": "Ayodhdya Hotel API is running"}
