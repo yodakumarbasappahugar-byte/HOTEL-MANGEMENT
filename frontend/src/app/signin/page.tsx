@@ -18,7 +18,7 @@ export default function SignIn() {
     setError('');
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://hotel-management-backend-2xln.onrender.app'}/api/signin`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://hotel-management-backend-2xln.onrender.com'}/api/signin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -28,7 +28,7 @@ export default function SignIn() {
 
       if (response.ok) {
         localStorage.setItem('user', JSON.stringify(data.user));
-        router.push('/dashboard');
+        router.push('/user-dashboard');
       } else {
         setError(data.detail || 'Sign in failed');
       }
