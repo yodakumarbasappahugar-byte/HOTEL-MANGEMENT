@@ -12,7 +12,12 @@ export default function Dashboard() {
     if (!savedUser) {
       router.push('/signin');
     } else {
-      setUser(JSON.parse(savedUser));
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (e) {
+        localStorage.removeItem('user');
+        router.push('/signin');
+      }
     }
   }, [router]);
 
@@ -21,71 +26,40 @@ export default function Dashboard() {
     router.push('/');
   };
 
-  if (!user) return <div className="auth-container"><p>Loading...</p></div>;
+  if (!user) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#0f172a', color: 'white' }}><p>Loading...</p></div>;
 
   return (
-    <>
-      <nav className="navbar">
-        <a href="/" className="logo">Ayodhdya Hotel</a>
-        <div className="nav-links">
-          <span className="user-welcome">Welcome, {user.username}</span>
-          <button onClick={handleLogout} className="btn btn-secondary" style={{ padding: '0.5rem 1.5rem', fontSize: '0.9rem', marginLeft: '1rem' }}>Logout</button>
+    <div style={{ backgroundColor: '#0f172a', color: 'white', minHeight: '100vh', padding: '2rem' }}>
+      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
+        <a href="/" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'white', textDecoration: 'none' }}>Ayodhdya Hotel</a>
+        <div>
+          <span style={{ color: '#94a3b8', marginRight: '1rem' }}>Welcome, {user.username}</span>
+          <button onClick={handleLogout} style={{ padding: '0.5rem 1rem', background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', borderRadius: '8px' }}>Logout</button>
         </div>
       </nav>
 
-      <main className="hero-container" style={{ justifyContent: 'flex-start', paddingTop: '5rem' }}>
-        <h1 style={{ fontSize: '3rem' }}>Your Dashboard</h1>
-        <p className="subtitle">
+      <main>
+        <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>Your Dashboard</h1>
+        <p style={{ color: '#94a3b8', marginBottom: '3rem' }}>
           Manage your luxury stays and explore exclusive Ayodhdya Hotel services.
         </p>
 
-        <div className="dashboard-grid">
-          <div className="dashboard-card">
-            <h3>My Bookings</h3>
-            <p>You have no active bookings.</p>
-            <a href="/rooms" className="btn btn-black" style={{ marginTop: '1rem', width: '100%', textAlign: 'center' }}>Book a Room</a>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+          <div style={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '15px', padding: '2rem' }}>
+            <h3 style={{ marginBottom: '1rem' }}>My Bookings</h3>
+            <p style={{ color: '#94a3b8' }}>You have no active bookings.</p>
+            <a href="/rooms" style={{ display: 'inline-block', marginTop: '1rem', padding: '0.75rem 1.5rem', background: 'black', color: 'white', textDecoration: 'none', borderRadius: '8px', width: '100%', textAlign: 'center' }}>Book a Room</a>
           </div>
           
-          <div className="dashboard-card">
-            <h3>Profile Details</h3>
-            <div className="profile-info">
+          <div style={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '15px', padding: '2rem' }}>
+            <h3 style={{ marginBottom: '1rem' }}>Profile Details</h3>
+            <div style={{ color: '#94a3b8' }}>
               <p><strong>Name:</strong> {user.username}</p>
               <p><strong>Email:</strong> {user.email}</p>
             </div>
           </div>
         </div>
       </main>
-
-      <style jsx>{`
-        .user-welcome {
-          color: #94a3b8;
-          font-weight: 500;
-        }
-        .dashboard-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 2rem;
-          width: 100%;
-          max-width: 1000px;
-          margin-top: 2rem;
-        }
-        .dashboard-card {
-          background: var(--glass-bg);
-          border: 1px solid var(--glass-border);
-          border-radius: 20px;
-          padding: 2rem;
-          text-align: left;
-          backdrop-filter: blur(20px);
-        }
-        .dashboard-card h3 {
-          margin-bottom: 1rem;
-          color: white;
-        }
-        .profile-info p {
-          margin: 0.5rem 0;
-          color: #94a3b8;
-        }
-      `}</style>
-    </>
+    </div>
   );
 }
