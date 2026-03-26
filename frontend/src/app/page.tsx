@@ -20,6 +20,7 @@ export default function Home() {
         <div className="button-group">
           <a href="/signin" className="btn btn-secondary">Sign In</a>
           <a href="/signup" className="btn btn-black">Create Account</a>
+          <a href="/database" className="btn btn-secondary" style={{ border: '1px dashed rgba(255,255,255,0.2)' }}>View Database</a>
         </div>
       </main>
     </>
