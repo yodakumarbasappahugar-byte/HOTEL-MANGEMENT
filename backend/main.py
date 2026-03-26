@@ -234,5 +234,6 @@ async def startup():
             logger.info("Tables created/verified successfully.")
     except Exception as e:
         logger.error(f"STARTUP ERROR: Failed to connect to database or create tables: {str(e)}")
-        # We re-raise to fail fast and let Render know something is wrong.
-        raise e
+        # We do NOT re-raise. We want the app to start and bind to the port
+        # so it stays alive and we can debug via /api/status.
+        logger.warning("Application is starting with a FAILED database connection. Check /api/status for details.")
