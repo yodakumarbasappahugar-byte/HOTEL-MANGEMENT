@@ -199,7 +199,9 @@ async def signup(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
     
     # Create new user
     # Hash password (bcrypt has a 72-byte limit)
-    pwd_to_hash = user_data.password[:72] if len(user_data.password) > 72 else user_data.password
+    # Hash password (bcrypt has a 72-byte limit, which is different from character count)
+    pwd_bytes = user_data.password.encode('utf-8')
+    pwd_to_hash = pwd_bytes[:72].decode('utf-8', 'ignore')
     hashed_password = pwd_context.hash(pwd_to_hash)
     new_user = User(
         username=user_data.name,
@@ -218,7 +220,9 @@ async def signin(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
     user = result.scalars().first()
     
     # Truncate password to 72 bytes for bcrypt compatibility
-    pwd_to_verify = user_data.password[:72] if len(user_data.password) > 72 else user_data.password
+    # Truncate password to 72 bytes for bcrypt compatibility
+    pwd_verify_bytes = user_data.password.encode('utf-8')
+    pwd_to_verify = pwd_verify_bytes[:72].decode('utf-8', 'ignore')
     
     if not user or not pwd_context.verify(pwd_to_verify, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password")
