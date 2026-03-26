@@ -24,28 +24,26 @@ def get_engine():
     global engine
     if engine is None:
         # The user provided DATABASE_URL might be overridden by Render
-        url = os.environ.get("DATABASE_URL", "postgresql+asyncpg://neondb_owner:npg_ZP3QMOzNCoa1@ep-soft-star-ade2wedr-pooler.c-2.us-east-1.aws.neon.tech/HOTEL%20MANGEMENT?sslmode=require")
+        url = os.environ.get("DATABASE_URL")
+        if not url:
+            url = "postgresql+asyncpg://neondb_owner:npg_ZP3QMOzNCoa1@ep-soft-star-ade2wedr.c-2.us-east-1.aws.neon.tech/neondb"
         
+        # Ensure it uses asyncpg
         if url.startswith("postgresql://"):
             url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
         elif url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql+asyncpg://", 1)
-        
-        if "channel_binding=require" in url:
-            url = url.replace("channel_binding=require", "channel_binding=disable")
-            url = url.replace("&channel_binding=disable", "")
-            url = url.replace("?channel_binding=disable", "")
-        
-        # Strip all other query parameters (like sslmode=require) and handle them in connect_args
+            
+        # Strip all query parameters and handle them in connect_args
         if "?" in url:
             url = url.split("?")[0]
             
-        # Unquote URL to handle %20 in database name correctly for asyncpg
-        url = urllib.parse.unquote(url)
-            
-        # Try direct connection instead of pooler to avoid possible hanging
-        if "-pooler" in url:
-            url = url.replace("-pooler", "", 1)
+        # Force neondb if it has spaces or %20 to avoid driver issues
+        if "HOTEL" in url or "%20" in url:
+            # Reconstruct to use neondb instead of the one with spaces
+            if "@" in url:
+                head, _ = url.rsplit("/", 1)
+                url = head + "/neondb"
             
         sanitized_url = url.split("@")[-1] if "@" in url else "HIDDEN"
         logger.info(f"Creating engine for {sanitized_url}")
