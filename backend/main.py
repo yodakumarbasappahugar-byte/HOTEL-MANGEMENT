@@ -24,6 +24,13 @@ if DATABASE_URL.startswith("postgresql://"):
 elif DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
 
+# Remove channel_binding=require as it can cause issues with some asyncpg versions
+if "channel_binding=require" in DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("channel_binding=require", "channel_binding=disable")
+    # or just remove it if it was the only param
+    DATABASE_URL = DATABASE_URL.replace("&channel_binding=disable", "")
+    DATABASE_URL = DATABASE_URL.replace("?channel_binding=disable", "")
+
 engine = create_async_engine(
     DATABASE_URL, 
     echo=True,
@@ -99,9 +106,14 @@ class RoomResponse(BaseModel):
 app = FastAPI(title="Ayodhdya Hotel API")
 
 # Configure CORS
+origins = [
+    "https://frontend-two-mocha-43.vercel.app",
+    "http://localhost:3000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
