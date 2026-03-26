@@ -106,15 +106,10 @@ class RoomResponse(BaseModel):
 app = FastAPI(title="Ayodhdya Hotel API")
 
 # Configure CORS
-origins = [
-    "https://frontend-two-mocha-43.vercel.app",
-    "http://localhost:3000",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -131,6 +126,10 @@ async def ping():
 @app.get("/")
 async def root():
     return {"message": "Ayodhdya Hotel API is running"}
+
+@app.get("/api/health")
+async def health():
+    return {"status": "ok", "message": "Backend is reachable (CORS Test)"}
 
 @app.post("/api/signup", response_model=UserResponse)
 async def signup(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
