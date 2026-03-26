@@ -22,7 +22,7 @@ engine = create_async_engine(
     pool_timeout=30,
     pool_recycle=1800,
     pool_pre_ping=True,
-    connect_args={"server_settings": {"statement_timeout": "20000"}} # 20s timeout
+    connect_args={"server_settings": {"statement_timeout": "45000"}} # 45s timeout
 )
 AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 Base = declarative_base()

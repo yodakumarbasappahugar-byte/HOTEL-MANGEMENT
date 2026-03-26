@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function SignIn() {
@@ -9,20 +9,38 @@ export default function SignIn() {
     email: '',
     password: ''
   });
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('Signing In...');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Proactively warm up the backend
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://hotel-management-backend-2xln.onrender.com'}/api/ping`).catch(() => {});
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setLoadingMessage('Signing In...');
+
+    const loadingTimeout = setTimeout(() => {
+      setLoadingMessage('Optimizing connection, please wait...');
+    }, 10000);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 150000); // 150s timeout (2.5 mins)
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://hotel-management-backend-2xln.onrender.com'}/api/signin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
+        signal: controller.signal
       });
+
+      clearTimeout(loadingTimeout);
+      clearTimeout(timeoutId);
 
       const data = await response.json();
 
@@ -32,8 +50,14 @@ export default function SignIn() {
       } else {
         setError(data.detail || 'Sign in failed');
       }
-    } catch (err) {
-      setError('Connection error. Please try again.');
+    } catch (err: any) {
+      clearTimeout(loadingTimeout);
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        setError('The server is still waking up from a deep sleep (Render Free Tier). This can take up to 3 minutes on the first try. Please refresh and try one more time.');
+      } else {
+        setError('Connection error. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -84,7 +108,7 @@ export default function SignIn() {
             </div>
             
             <button type="submit" className="btn btn-black auth-btn" disabled={loading}>
-              {loading ? 'Signing In...' : 'Sign In'}
+              {loading ? loadingMessage : 'Sign In'}
             </button>
           </form>
           
