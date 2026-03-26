@@ -198,10 +198,13 @@ async def signup(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
     
     # Create new user
+    # Hash password (bcrypt has a 72-byte limit)
+    pwd_to_hash = user_data.password[:72] if len(user_data.password) > 72 else user_data.password
+    hashed_password = pwd_context.hash(pwd_to_hash)
     new_user = User(
         username=user_data.name,
         email=user_data.email,
-        password_hash=pwd_context.hash(user_data.password)
+        password_hash=hashed_password
     )
     db.add(new_user)
     await db.commit()
