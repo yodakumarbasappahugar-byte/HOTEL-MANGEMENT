@@ -14,40 +14,47 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Database configuration
-# Convert to asyncpg if needed, or use the provided string directly with a compatible driver
-# The user provided: postgresql://neondb_owner:npg_ZP3QMOzNCoa1@ep-soft-star-ade2wedr-pooler.c-2.us-east-1.aws.neon.tech/HOTEL%20MANGEMENT?sslmode=require&channel_binding=require
-DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql+asyncpg://neondb_owner:npg_ZP3QMOzNCoa1@ep-soft-star-ade2wedr-pooler.c-2.us-east-1.aws.neon.tech/HOTEL%20MANGEMENT?sslmode=require")
-
-if DATABASE_URL.startswith("postgresql://"):
-    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
-elif DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
-
-# Remove channel_binding=require as it can cause issues with some asyncpg versions
-if "channel_binding=require" in DATABASE_URL:
-    DATABASE_URL = DATABASE_URL.replace("channel_binding=require", "channel_binding=disable")
-    # or just remove it if it was the only param
-    DATABASE_URL = DATABASE_URL.replace("&channel_binding=disable", "")
-    DATABASE_URL = DATABASE_URL.replace("?channel_binding=disable", "")
-
-engine = create_async_engine(
-    DATABASE_URL, 
-    echo=True,
-    pool_size=5,
-    max_overflow=10,
-    pool_timeout=30,
-    pool_recycle=1800,
-    pool_pre_ping=True,
-    connect_args={"server_settings": {"statement_timeout": "45000"}} # 45s timeout
-)
-
-# Log the connection (sanitized)
-sanitized_url = DATABASE_URL.split("@")[-1] if "@" in DATABASE_URL else "HIDDEN"
-logger.info(f"Connecting to database at {sanitized_url}")
-
-AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+# Database configuration (initialized lazily or in startup)
+engine = None
+AsyncSessionLocal = None
 Base = declarative_base()
+
+def get_engine():
+    global engine
+    if engine is None:
+        # The user provided DATABASE_URL might be overridden by Render
+        url = os.environ.get("DATABASE_URL", "postgresql+asyncpg://neondb_owner:npg_ZP3QMOzNCoa1@ep-soft-star-ade2wedr-pooler.c-2.us-east-1.aws.neon.tech/HOTEL%20MANGEMENT?sslmode=require")
+        
+        if url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        
+        if "channel_binding=require" in url:
+            url = url.replace("channel_binding=require", "channel_binding=disable")
+            url = url.replace("&channel_binding=disable", "")
+            url = url.replace("?channel_binding=disable", "")
+            
+        sanitized_url = url.split("@")[-1] if "@" in url else "HIDDEN"
+        logger.info(f"Creating engine for {sanitized_url}")
+        
+        engine = create_async_engine(
+            url, 
+            echo=True,
+            pool_size=5,
+            max_overflow=10,
+            pool_timeout=30,
+            pool_recycle=1800,
+            pool_pre_ping=True,
+            connect_args={"server_settings": {"statement_timeout": "45000"}} 
+        )
+    return engine
+
+def get_sessionmaker():
+    global AsyncSessionLocal
+    if AsyncSessionLocal is None:
+        AsyncSessionLocal = sessionmaker(get_engine(), class_=AsyncSession, expire_on_commit=False)
+    return AsyncSessionLocal
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=10)
@@ -116,7 +123,8 @@ app.add_middleware(
 
 # Dependency to get DB session
 async def get_db():
-    async with AsyncSessionLocal() as session:
+    session_factory = get_sessionmaker()
+    async with session_factory() as session:
         yield session
 
 @app.get("/api/ping")
@@ -239,12 +247,12 @@ async def seed_rooms(db: AsyncSession = Depends(get_db)):
 async def startup():
     logger.info("Application starting up...")
     try:
-        async with engine.begin() as conn:
+        # Initialize engine and sessionmaker
+        current_engine = get_engine()
+        async with current_engine.begin() as conn:
             logger.info("Successfully connected to database. Creating tables if they don't exist...")
             await conn.run_sync(Base.metadata.create_all)
             logger.info("Tables created/verified successfully.")
     except Exception as e:
         logger.error(f"STARTUP ERROR: Failed to connect to database or create tables: {str(e)}")
-        # We do NOT re-raise. We want the app to start and bind to the port
-        # so it stays alive and we can debug via /api/status.
         logger.warning("Application is starting with a FAILED database connection. Check /api/status for details.")
