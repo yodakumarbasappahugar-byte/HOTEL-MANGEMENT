@@ -199,10 +199,20 @@ async def signup(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
     
     # Create new user
     # Hash password (bcrypt has a 72-byte limit)
-    # Hash password (bcrypt has a 72-byte limit, which is different from character count)
-    pwd_bytes = user_data.password.encode('utf-8')
-    pwd_to_hash = pwd_bytes[:72].decode('utf-8', 'ignore')
-    hashed_password = pwd_context.hash(pwd_to_hash)
+    # Hash password (bcrypt has a 72-byte limit)
+    try:
+        raw_pwd = user_data.password
+        pwd_bytes = raw_pwd.encode('utf-8')
+        # Truncate to 71 just to be super safe (1 byte under the limit)
+        pwd_to_hash = pwd_bytes[:71].decode('utf-8', 'ignore')
+        logger.info(f"Hashing password: CharLen={len(raw_pwd)}, ByteLen={len(pwd_bytes)}, TruncatedTo={len(pwd_to_hash)}")
+        hashed_password = pwd_context.hash(pwd_to_hash)
+    except Exception as e:
+        logger.error(f"HASHING FAILED: {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Hashing error: {str(e)} | CharLen={len(user_data.password)} | ByteLen={len(user_data.password.encode('utf-8'))}"
+        )
     new_user = User(
         username=user_data.name,
         email=user_data.email,
@@ -221,11 +231,20 @@ async def signin(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
     
     # Truncate password to 72 bytes for bcrypt compatibility
     # Truncate password to 72 bytes for bcrypt compatibility
-    pwd_verify_bytes = user_data.password.encode('utf-8')
-    pwd_to_verify = pwd_verify_bytes[:72].decode('utf-8', 'ignore')
-    
-    if not user or not pwd_context.verify(pwd_to_verify, user.password_hash):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+    try:
+        raw_pwd = user_data.password
+        pwd_bytes = raw_pwd.encode('utf-8')
+        pwd_to_verify = pwd_bytes[:71].decode('utf-8', 'ignore')
+        
+        if not user or not pwd_context.verify(pwd_to_verify, user.password_hash):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+    except Exception as e:
+        if isinstance(e, HTTPException): raise e
+        logger.error(f"VERIFICATION FAILED: {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Verification error: {str(e)} | ByteLen={len(user_data.password.encode('utf-8'))}"
+        )
     
     return {
         "message": "Login successful",
