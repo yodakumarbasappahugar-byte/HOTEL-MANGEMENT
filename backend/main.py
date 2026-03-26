@@ -1,6 +1,5 @@
-try:
-    from fastapi import FastAPI, HTTPException, Depends, status
-    from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import datetime
@@ -9,6 +8,11 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, text
 from passlib.context import CryptContext
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Database configuration
 # Convert to asyncpg if needed, or use the provided string directly with a compatible driver
@@ -30,6 +34,11 @@ engine = create_async_engine(
     pool_pre_ping=True,
     connect_args={"server_settings": {"statement_timeout": "45000"}} # 45s timeout
 )
+
+# Log the connection (sanitized)
+sanitized_url = DATABASE_URL.split("@")[-1] if "@" in DATABASE_URL else "HIDDEN"
+logger.info(f"Connecting to database at {sanitized_url}")
+
 AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 Base = declarative_base()
 
@@ -162,6 +171,31 @@ async def get_rooms(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Room))
     return result.scalars().all()
 
+@app.get("/api/users", response_model=List[UserResponse])
+async def get_users(db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import select
+    result = await db.execute(select(User))
+    return result.scalars().all()
+
+@app.get("/api/db-stats")
+async def get_db_stats(db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import select, func
+    user_result = await db.execute(select(func.count(User.id)))
+    room_result = await db.execute(select(func.count(Room.id)))
+    return {
+        "users": user_result.scalar(),
+        "rooms": room_result.scalar(),
+        "last_updated": datetime.utcnow()
+    }
+
+@app.post("/api/rooms/seed")
+async def seed_rooms(db: AsyncSession = Depends(get_db)):
+    # Check if rooms already exist
+    from sqlalchemy import select
+    result = await db.execute(select(Room))
+    if result.scalars().first():
+        return {"message": "Rooms already seeded"}
+    
     rooms = [
         Room(
             name="Luxury Sunset Suite",
@@ -192,5 +226,13 @@ async def get_rooms(db: AsyncSession = Depends(get_db)):
 # Table creation (utility)
 @app.on_event("startup")
 async def startup():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    logger.info("Application starting up...")
+    try:
+        async with engine.begin() as conn:
+            logger.info("Successfully connected to database. Creating tables if they don't exist...")
+            await conn.run_sync(Base.metadata.create_all)
+            logger.info("Tables created/verified successfully.")
+    except Exception as e:
+        logger.error(f"STARTUP ERROR: Failed to connect to database or create tables: {str(e)}")
+        # We re-raise to fail fast and let Render know something is wrong.
+        raise e
