@@ -246,23 +246,23 @@ async def seed_rooms(db: AsyncSession = Depends(get_db)):
     await db.commit()
     return {"message": "Rooms seeded successfully"}
 
-# Table creation (utility)
-@app.on_event("startup")
-async def startup():
-    logger.info("Application starting up...")
-    try:
-        # Initialize engine and sessionmaker
-        current_engine = get_engine()
-        # Use a timeout for the startup connection to avoid hanging the entire app
-        import asyncio
-        try:
-            async with asyncio.timeout(10): # 10s timeout
-                async with current_engine.begin() as conn:
-                    logger.info("Successfully connected to database. Creating tables if they don't exist...")
-                    await conn.run_sync(Base.metadata.create_all)
-                    logger.info("Tables created/verified successfully.")
-        except asyncio.TimeoutError:
-            logger.error("STARTUP TIMEOUT: Database connection took too long (>10s).")
-    except Exception as e:
-        logger.error(f"STARTUP ERROR: Failed to connect to database or create tables: {str(e)}")
-        logger.warning("Application is starting with a FAILED database connection. Check /api/status for details.")
+# Table creation (utility) - Commented out to avoid blocking Render port binding
+# @app.on_event("startup")
+# async def startup():
+#     logger.info("Application starting up...")
+#     try:
+#         # Initialize engine and sessionmaker
+#         current_engine = get_engine()
+#         # Use a timeout for the startup connection to avoid hanging the entire app
+#         import asyncio
+#         try:
+#             async with asyncio.timeout(10): # 10s timeout
+#                 async with current_engine.begin() as conn:
+#                     logger.info("Successfully connected to database. Creating tables if they don't exist...")
+#                     await conn.run_sync(Base.metadata.create_all)
+#                     logger.info("Tables created/verified successfully.")
+#         except asyncio.TimeoutError:
+#             logger.error("STARTUP TIMEOUT: Database connection took too long (>10s).")
+#     except Exception as e:
+#         logger.error(f"STARTUP ERROR: Failed to connect to database or create tables: {str(e)}")
+#         logger.warning("Application is starting with a FAILED database connection. Check /api/status for details.")
