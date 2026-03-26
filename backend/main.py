@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException, Depends, status
-from fastapi.middleware.cors import CORSMiddleware
+try:
+    from fastapi import FastAPI, HTTPException, Depends, status
+    from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import datetime
@@ -161,31 +162,6 @@ async def get_rooms(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Room))
     return result.scalars().all()
 
-@app.get("/api/users", response_model=List[UserResponse])
-async def get_users(db: AsyncSession = Depends(get_db)):
-    from sqlalchemy import select
-    result = await db.execute(select(User))
-    return result.scalars().all()
-
-@app.get("/api/db-stats")
-async def get_db_stats(db: AsyncSession = Depends(get_db)):
-    from sqlalchemy import select, func
-    user_result = await db.execute(select(func.count(User.id)))
-    room_result = await db.execute(select(func.count(Room.id)))
-    return {
-        "users": user_result.scalar(),
-        "rooms": room_result.scalar(),
-        "last_updated": datetime.utcnow()
-    }
-
-@app.post("/api/rooms/seed")
-async def seed_rooms(db: AsyncSession = Depends(get_db)):
-    # Check if rooms already exist
-    from sqlalchemy import select
-    result = await db.execute(select(Room))
-    if result.scalars().first():
-        return {"message": "Rooms already seeded"}
-    
     rooms = [
         Room(
             name="Luxury Sunset Suite",
