@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, text
 from passlib.context import CryptContext
 import logging
+import urllib.parse
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -38,6 +39,9 @@ def get_engine():
         # Strip all other query parameters (like sslmode=require) and handle them in connect_args
         if "?" in url:
             url = url.split("?")[0]
+            
+        # Unquote URL to handle %20 in database name correctly for asyncpg
+        url = urllib.parse.unquote(url)
             
         # Try direct connection instead of pooler to avoid possible hanging
         if "-pooler" in url:
