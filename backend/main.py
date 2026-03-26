@@ -125,14 +125,40 @@ class RoomResponse(BaseModel):
 
 app = FastAPI(title="Ayodhdya Hotel API")
 
-# Configure CORS
+# Explicitly allow the user's Vercel frontend origin
+ALLOWED_ORIGINS = [
+    "https://frontend-two-mocha-43.vercel.app",
+    "https://hotel-management-backend-2xln.onrender.com",
+    "http://localhost:3000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"], # Keep * for now to be safe, but we will also use a custom handler
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Custom logging middleware to see what's happening on Render
+@app.middleware("http")
+async def log_requests(request, call_next):
+    logger.info(f"Incoming request: {request.method} {request.url.path}")
+    response = await call_next(request)
+    logger.info(f"Response status: {response.status_code}")
+    # Force CORS headers on every response just in case
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    logger.error(f"GLOBAL ERROR: {str(exc)}")
+    from fastapi.responses import JSONResponse
+    return JSONResponse(
+        status_code=500,
+        content={"message": "Internal Server Error", "detail": str(exc)},
+        headers={"Access-Control-Allow-Origin": "*"}
+    )
 
 # Dependency to get DB session
 async def get_db():
