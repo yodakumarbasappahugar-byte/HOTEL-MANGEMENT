@@ -217,7 +217,10 @@ async def signin(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == user_data.email))
     user = result.scalars().first()
     
-    if not user or not pwd_context.verify(user_data.password, user.password_hash):
+    # Truncate password to 72 bytes for bcrypt compatibility
+    pwd_to_verify = user_data.password[:72] if len(user_data.password) > 72 else user_data.password
+    
+    if not user or not pwd_context.verify(pwd_to_verify, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     
     return {
