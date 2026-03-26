@@ -143,6 +143,17 @@ async def root():
 async def health():
     return {"status": "ok", "message": "Backend is reachable (CORS Test)"}
 
+@app.get("/api/db-test")
+async def db_test(db: AsyncSession = Depends(get_db)):
+    try:
+        import asyncio
+        async with asyncio.timeout(5):
+            await db.execute(text("SELECT 1"))
+        return {"status": "connected", "message": "Database is reachable"}
+    except Exception as e:
+        logger.error(f"DB TEST FAILED: {str(e)}")
+        return {"status": "error", "message": str(e)}
+
 @app.post("/api/signup", response_model=UserResponse)
 async def signup(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
     # Check if email already exists
