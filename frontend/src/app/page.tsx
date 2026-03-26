@@ -12,7 +12,7 @@ export default function Home() {
       </nav>
 
       <main className="hero-container">
-        <h1>Welcome to Ayodhdya Hotel (v2.1)</h1>
+        <h1>Welcome to Ayodhdya Hotel</h1>
         <p className="subtitle">
           Experience the finest hospitality. Manage your bookings, discover new properties, and enjoy a seamless stay with our premium hotel management platform.
         </p>
