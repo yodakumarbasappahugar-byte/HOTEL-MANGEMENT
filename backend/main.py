@@ -34,6 +34,10 @@ def get_engine():
             url = url.replace("channel_binding=require", "channel_binding=disable")
             url = url.replace("&channel_binding=disable", "")
             url = url.replace("?channel_binding=disable", "")
+        
+        # Try direct connection instead of pooler to avoid possible hanging
+        if "-pooler" in url:
+            url = url.replace("-pooler", "", 1)
             
         sanitized_url = url.split("@")[-1] if "@" in url else "HIDDEN"
         logger.info(f"Creating engine for {sanitized_url}")
@@ -249,10 +253,16 @@ async def startup():
     try:
         # Initialize engine and sessionmaker
         current_engine = get_engine()
-        async with current_engine.begin() as conn:
-            logger.info("Successfully connected to database. Creating tables if they don't exist...")
-            await conn.run_sync(Base.metadata.create_all)
-            logger.info("Tables created/verified successfully.")
+        # Use a timeout for the startup connection to avoid hanging the entire app
+        import asyncio
+        try:
+            async with asyncio.timeout(10): # 10s timeout
+                async with current_engine.begin() as conn:
+                    logger.info("Successfully connected to database. Creating tables if they don't exist...")
+                    await conn.run_sync(Base.metadata.create_all)
+                    logger.info("Tables created/verified successfully.")
+        except asyncio.TimeoutError:
+            logger.error("STARTUP TIMEOUT: Database connection took too long (>10s).")
     except Exception as e:
         logger.error(f"STARTUP ERROR: Failed to connect to database or create tables: {str(e)}")
         logger.warning("Application is starting with a FAILED database connection. Check /api/status for details.")
