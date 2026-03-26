@@ -35,6 +35,10 @@ def get_engine():
             url = url.replace("&channel_binding=disable", "")
             url = url.replace("?channel_binding=disable", "")
         
+        # Strip all other query parameters (like sslmode=require) and handle them in connect_args
+        if "?" in url:
+            url = url.split("?")[0]
+            
         # Try direct connection instead of pooler to avoid possible hanging
         if "-pooler" in url:
             url = url.replace("-pooler", "", 1)
@@ -50,7 +54,10 @@ def get_engine():
             pool_timeout=30,
             pool_recycle=1800,
             pool_pre_ping=True,
-            connect_args={"server_settings": {"statement_timeout": "45000"}} 
+            connect_args={
+                "server_settings": {"statement_timeout": "45000"},
+                "ssl": True # Explicitly handle SSL for Neon
+            } 
         )
     return engine
 
