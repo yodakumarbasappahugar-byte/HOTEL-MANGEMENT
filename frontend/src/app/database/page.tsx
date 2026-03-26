@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 
 interface User {
   id: number;
-  username: str;
+  username: string;
   email: string;
   created_at: string;
 }
