@@ -270,9 +270,16 @@ async def api_status():
 
 @app.get("/api/rooms", response_model=List[RoomResponse])
 async def get_rooms(db: AsyncSession = Depends(get_db)):
-    from sqlalchemy import select
-    result = await db.execute(select(Room))
-    return result.scalars().all()
+    try:
+        from sqlalchemy import select
+        logger.info("Fetching rooms from database...")
+        result = await db.execute(select(Room))
+        rooms = result.scalars().all()
+        logger.info(f"Found {len(rooms)} rooms. Starting serialization...")
+        return rooms
+    except Exception as e:
+        logger.error(f"FETCH ROOMS FAILED: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @app.get("/api/rooms/{room_id}", response_model=RoomResponse)
 async def get_room(room_id: int, db: AsyncSession = Depends(get_db)):
