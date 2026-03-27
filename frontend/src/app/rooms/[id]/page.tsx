@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import Link from 'next/link';
 
 interface Room {
   id: number;
@@ -36,6 +37,7 @@ export default function BookRoomPage() {
           setError('The requested suite was not found');
         }
       } catch (err) {
+        console.error('Fetch error:', err);
         setError('Vault connection interrupted');
       } finally {
         setLoading(false);
@@ -128,7 +130,7 @@ export default function BookRoomPage() {
         justifyContent: 'space-between',
         alignItems: 'center'
       }}>
-        <a href="/rooms" style={{ color: '#D4AF37', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 'bold', letterSpacing: '1px' }}>← RETURN TO SELECTION</a>
+        <Link href="/rooms" style={{ color: '#D4AF37', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 'bold', letterSpacing: '1px' }}>← RETURN TO SELECTION</Link>
         <div style={{ fontSize: '1.2rem', fontWeight: '900', color: 'white', letterSpacing: '-1px' }}>AYODHDYA <span style={{ color: '#D4AF37' }}>RESERVATIONS</span></div>
       </nav>
 
@@ -137,99 +139,119 @@ export default function BookRoomPage() {
           <div style={{ animation: 'fadeInLeft 0.8s ease-out' }}>
             <div style={{ borderRadius: '32px', overflow: 'hidden', border: '1px solid rgba(212, 175, 55, 0.3)', boxShadow: '0 20px 40px rgba(0,0,0,0.4)', marginBottom: '3rem' }}>
               <img 
-                src={room.image_url} 
+                src={room.image_url || '/luxury.png'} 
                 alt={room.name} 
                 style={{ width: '100%', display: 'block' }} 
                 onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80' }}
               />
             </div>
-            <span style={{ color: '#D4AF37', letterSpacing: '3px', fontSize: '0.8rem', fontWeight: 'bold' }}>{room.room_type.toUpperCase()}</span>
-            <h1 style={{ fontSize: '3.5rem', marginTop: '0.5rem', marginBottom: '1.5rem', fontWeight: '900', letterSpacing: '-2px' }}>{room.name}</h1>
-            <p style={{ color: '#94a3b8', fontSize: '1.2rem', lineHeight: '1.8', fontWeight: '300' }}>{room.description}</p>
+            
+            <h1 style={{ fontSize: '4rem', fontWeight: '900', marginBottom: '1rem', letterSpacing: '-2px' }}>{room.name}</h1>
+            <div style={{ color: '#D4AF37', fontWeight: 'bold', letterSpacing: '2px', marginBottom: '2.5rem' }}>{room.room_type.toUpperCase()}</div>
+            <p style={{ fontSize: '1.4rem', lineHeight: '1.8', color: '#94a3b8', marginBottom: '3rem' }}>{room.description}</p>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '3rem' }}>
+              <div>
+                <div style={{ color: '#D4AF37', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>CAPACITY</div>
+                <div style={{ fontSize: '1.2rem' }}>2 Guests</div>
+              </div>
+              <div>
+                <div style={{ color: '#D4AF37', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>VIEW</div>
+                <div style={{ fontSize: '1.2rem' }}>Cityscape</div>
+              </div>
+              <div>
+                <div style={{ color: '#D4AF37', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>SERVICE</div>
+                <div style={{ fontSize: '1.2rem' }}>24/7 Butler</div>
+              </div>
+            </div>
           </div>
 
-          <div style={{ 
-            background: 'linear-gradient(145deg, #0a0a0a, #111)', 
-            padding: '3rem', 
-            borderRadius: '32px', 
-            border: '1px solid rgba(212, 175, 55, 0.2)', 
-            position: 'sticky',
-            top: '8rem',
-            animation: 'fadeInRight 0.8s ease-out'
-          }}>
-            <h2 style={{ fontSize: '1.8rem', marginBottom: '2.5rem', fontWeight: '800' }}>Confirm Stay</h2>
-            
+          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(212, 175, 55, 0.2)', borderRadius: '40px', padding: '3rem', position: 'sticky', top: '8rem', backdropFilter: 'blur(10px)' }}>
+            <div style={{ marginBottom: '3rem' }}>
+              <div style={{ color: '#94a3b8', marginBottom: '0.5rem' }}>Price per night</div>
+              <div style={{ fontSize: '2.5rem', fontWeight: '900' }}>${room.price_per_night} <span style={{ fontSize: '1rem', color: '#94a3b8', fontWeight: 'normal' }}>USD</span></div>
+            </div>
+
             {bookingSuccess ? (
-              <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-                <div style={{ 
-                  width: '80px', 
-                  height: '80px', 
-                  background: 'rgba(16, 185, 129, 0.1)', 
-                  borderRadius: '50%', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  margin: '0 auto 2rem',
-                  border: '1px solid #10b981'
-                }}>
-                  <span style={{ fontSize: '2.5rem' }}>✓</span>
+              <div style={{ textAlign: 'center', padding: '2rem 0', animation: 'fadeIn 0.5s ease-out' }}>
+                <div style={{ width: '80px', height: '80px', background: '#D4AF37', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem' }}>
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
-                <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>RESERVATION SECURED</h3>
-                <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Preparing your welcome at Ayodhdya Hotel...</p>
+                <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>RESERVATION SECURED</h2>
+                <p style={{ color: '#94a3b8' }}>Redirecting to your dashboard...</p>
               </div>
             ) : (
               <form onSubmit={handleBooking}>
                 <div style={{ marginBottom: '2rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.8rem', color: '#D4AF37', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '1px' }}>ARRIVAL DATE</label>
-                  <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} required style={{ width: '100%', padding: '1.2rem', background: '#000', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', color: 'white', outline: 'none', transition: 'border-color 0.3s' }} onFocus={(e) => e.target.style.borderColor = '#D4AF37'} onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}/>
-                </div>
-                <div style={{ marginBottom: '2.5rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.8rem', color: '#D4AF37', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '1px' }}>DEPARTURE DATE</label>
-                  <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} required style={{ width: '100%', padding: '1.2rem', background: '#000', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', color: 'white', outline: 'none', transition: 'border-color 0.3s' }} onFocus={(e) => e.target.style.borderColor = '#D4AF37'} onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}/>
+                  <label style={{ display: 'block', color: '#D4AF37', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '1rem', letterSpacing: '1px' }}>CHECK-IN DATE</label>
+                  <input 
+                    type="date" 
+                    required
+                    value={checkIn}
+                    onChange={(e) => setCheckIn(e.target.value)}
+                    style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '15px', padding: '1.2rem', color: 'white', outline: 'none' }}
+                  />
                 </div>
 
-                <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '2rem', marginBottom: '3rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', color: '#64748b' }}>
-                    <span>Standard rate</span>
-                    <span>${room.price_per_night} / night</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '1.1rem', fontWeight: '600' }}>Grand Total</span>
-                    <span style={{ fontSize: '2.2rem', fontWeight: '900', color: '#D4AF37' }}>${calculateTotalPrice()}</span>
-                  </div>
+                <div style={{ marginBottom: '2.5rem' }}>
+                  <label style={{ display: 'block', color: '#D4AF37', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '1rem', letterSpacing: '1px' }}>CHECK-OUT DATE</label>
+                  <input 
+                    type="date" 
+                    required
+                    value={checkOut}
+                    onChange={(e) => setCheckOut(e.target.value)}
+                    style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '15px', padding: '1.2rem', color: 'white', outline: 'none' }}
+                  />
                 </div>
+
+                {calculateTotalPrice() > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '2rem 0', borderTop: '1px solid rgba(255,255,255,0.1)', marginBottom: '2.5rem' }}>
+                    <span style={{ color: '#94a3b8' }}>Grand Total</span>
+                    <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#D4AF37' }}>${calculateTotalPrice()}</span>
+                  </div>
+                )}
 
                 <button 
-                  type="submit" 
-                  disabled={bookingLoading || !checkIn || !checkOut}
+                  disabled={bookingLoading}
                   style={{ 
                     width: '100%', 
                     padding: '1.5rem', 
-                    background: 'white', 
+                    background: bookingLoading ? '#333' : '#D4AF37', 
                     color: 'black', 
                     border: 'none', 
                     borderRadius: '20px', 
+                    fontSize: '1.1rem', 
                     fontWeight: '900', 
-                    fontSize: '1rem', 
-                    cursor: 'pointer', 
-                    transition: 'all 0.3s',
-                    opacity: (bookingLoading || !checkIn || !checkOut) ? 0.5 : 1,
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
+                    cursor: bookingLoading ? 'not-allowed' : 'pointer',
+                    transition: 'transform 0.2s ease, opacity 0.2s ease',
+                    letterSpacing: '1px'
                   }}
-                  onMouseEnter={(e) => { if(!bookingLoading && checkIn && checkOut) e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.backgroundColor = '#D4AF37'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.backgroundColor = 'white'; }}
+                  onMouseOver={(e) => !bookingLoading && (e.currentTarget.style.transform = 'translateY(-2px)')}
+                  onMouseOut={(e) => !bookingLoading && (e.currentTarget.style.transform = 'translateY(0)')}
                 >
-                  {bookingLoading ? 'SECURING...' : 'CONFIRM RESERVATION'}
+                  {bookingLoading ? 'PROSESSING...' : 'CONFIRM RESERVATION'}
                 </button>
               </form>
             )}
+            
+            <p style={{ textAlign: 'center', color: '#64748b', fontSize: '0.8rem', marginTop: '2rem' }}>Price includes all premium amenities and taxes.</p>
           </div>
         </div>
       </main>
 
       <style jsx global>{`
-        @keyframes fadeInLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes fadeInRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeInLeft {
+          from { opacity: 0; transform: translateX(-30px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        input::-webkit-calendar-picker-indicator {
+          filter: invert(1);
+          cursor: pointer;
+        }
       `}</style>
     </div>
   );

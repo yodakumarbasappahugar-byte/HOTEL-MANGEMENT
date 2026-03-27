@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface Room {
   id: number;
@@ -55,7 +56,7 @@ export default function RoomsPage() {
         zIndex: 100, 
         borderBottom: '1px solid rgba(212, 175, 55, 0.2)' 
       }}>
-        <a href="/" style={{ 
+        <Link href="/" style={{ 
           fontSize: '1.8rem', 
           fontWeight: '900', 
           color: '#D4AF37', 
@@ -63,10 +64,10 @@ export default function RoomsPage() {
           letterSpacing: '-1px'
         }}>
           AYODHDYA <span style={{ color: 'white', fontWeight: '300' }}>HOTEL</span>
-        </a>
+        </Link>
         <div style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }}>
-          <a href="/dashboard" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500', transition: 'color 0.3s' }}>DASHBOARD</a>
-          <a href="/signin" style={{ 
+          <Link href="/dashboard" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500', transition: 'color 0.3s' }}>DASHBOARD</Link>
+          <Link href="/signin" style={{ 
             color: 'white', 
             textDecoration: 'none', 
             fontSize: '0.9rem', 
@@ -75,7 +76,7 @@ export default function RoomsPage() {
             border: '1px solid #D4AF37', 
             borderRadius: '50px',
             backgroundColor: 'rgba(212, 175, 55, 0.1)'
-          }}>SIGN IN</a>
+          }}>SIGN IN</Link>
         </div>
       </nav>
 
@@ -152,8 +153,9 @@ export default function RoomsPage() {
                 }} className="room-card">
                   <div style={{ height: '300px', overflow: 'hidden', position: 'relative' }}>
                     <img 
-                      src={room.image_url || '/images/rooms/fallback.png'} 
+                      src={room.image_url || '/luxury.png'} 
                       alt={room.name} 
+                      aria-hidden="false"
                       style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} 
                       onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80' }}
                     />
@@ -202,7 +204,7 @@ export default function RoomsPage() {
                       </div>
                       
                       <button 
-                        onClick={() => router.push(`/rooms/book/${room.id}`)}
+                        onClick={() => router.push(`/rooms/${room.id}`)}
                         style={{ 
                           padding: '1.2rem 2.5rem', 
                           background: 'white', 

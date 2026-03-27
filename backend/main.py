@@ -344,21 +344,21 @@ async def seed_rooms(db: AsyncSession = Depends(get_db)):
             room_type="Luxury Suite",
             price_per_night=1200,
             description="Ultra-luxury suite with floor-to-ceiling windows and panoramic city views.",
-            image_url="/images/rooms/luxury.png"
+            image_url="/luxury.png"
         ),
         Room(
             name="Deluxe Ocean View",
             room_type="Deluxe Room",
             price_per_night=650,
             description="Contemporary room with a private balcony and stunning ocean vistas.",
-            image_url="/images/rooms/deluxe.png"
+            image_url="/deluxe.png"
         ),
         Room(
             name="Royal Presidential Suite",
             room_type="Presidential Suite",
             price_per_night=2500,
             description="Grandest suite with private infinity pool and opulent marble finishings.",
-            image_url="/images/rooms/royal.png"
+            image_url="/royal.png"
         )
     ]
     db.add_all(rooms)
