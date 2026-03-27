@@ -330,6 +330,12 @@ async def get_user_bookings(user_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Booking).where(Booking.user_id == user_id))
     return result.scalars().all()
 
+@app.post("/api/rooms/clear")
+async def clear_rooms(db: AsyncSession = Depends(get_db)):
+    await db.execute(delete(Room))
+    await db.commit()
+    return {"message": "All rooms cleared"}
+
 @app.post("/api/rooms/seed")
 async def seed_rooms(db: AsyncSession = Depends(get_db)):
     # Check if rooms already exist
