@@ -127,9 +127,9 @@ class RoomResponse(BaseModel):
     name: str
     room_type: str
     price_per_night: int
-    description: str
-    image_url: str
-    is_available: str
+    description: Optional[str] = None
+    image_url: Optional[str] = None
+    is_available: Optional[str] = "Available"
 
     class Config:
         from_attributes = True
@@ -304,7 +304,6 @@ async def get_db_stats(db: AsyncSession = Depends(get_db)):
 
 @app.post("/api/bookings", response_model=BookingResponse)
 async def create_booking(booking: BookingCreate, db: AsyncSession = Depends(get_db)):
-    from datetime import datetime
     new_booking = Booking(
         user_id=booking.user_id,
         room_id=booking.room_id,
