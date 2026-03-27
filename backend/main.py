@@ -330,6 +330,25 @@ async def get_user_bookings(user_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Booking).where(Booking.user_id == user_id))
     return result.scalars().all()
 
+@app.post("/api/rooms/fix-images")
+async def fix_image_paths(db: AsyncSession = Depends(get_db)):
+    """Update stale image paths in the database to match current Vercel public structure."""
+    from sqlalchemy import select, update as sql_update
+    path_map = {
+        "/images/rooms/luxury.png": "/luxury.png",
+        "/images/rooms/deluxe.png": "/deluxe.png",
+        "/images/rooms/royal.png": "/royal.png",
+    }
+    fixed = 0
+    for old_path, new_path in path_map.items():
+        result = await db.execute(select(Room).where(Room.image_url == old_path))
+        rooms_to_fix = result.scalars().all()
+        for room in rooms_to_fix:
+            room.image_url = new_path
+            fixed += 1
+    await db.commit()
+    return {"message": f"Fixed {fixed} room image paths", "updated": fixed}
+
 @app.post("/api/rooms/clear")
 async def clear_rooms(db: AsyncSession = Depends(get_db)):
     await db.execute(delete(Room))
