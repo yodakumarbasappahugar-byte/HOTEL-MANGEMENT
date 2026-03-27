@@ -92,6 +92,17 @@ class Room(Base):
     is_available = Column(String(20), default="Available")
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class Booking(Base):
+    __tablename__ = "bookings"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True)
+    room_id = Column(Integer, index=True)
+    check_in = Column(DateTime, nullable=False)
+    check_out = Column(DateTime, nullable=False)
+    total_price = Column(Integer, nullable=False)
+    status = Column(String(20), default="Confirmed")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 # Pydantic Schemas
 class UserCreate(BaseModel):
     name: str  # We'll use this as username
@@ -119,6 +130,26 @@ class RoomResponse(BaseModel):
     description: str
     image_url: str
     is_available: str
+
+    class Config:
+        from_attributes = True
+
+class BookingCreate(BaseModel):
+    user_id: int
+    room_id: int
+    check_in: str # ISO format
+    check_out: str # ISO format
+    total_price: int
+
+class BookingResponse(BaseModel):
+    id: int
+    user_id: int
+    room_id: int
+    check_in: datetime
+    check_out: datetime
+    total_price: int
+    status: str
+    created_at: datetime
 
     class Config:
         from_attributes = True
@@ -243,6 +274,15 @@ async def get_rooms(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Room))
     return result.scalars().all()
 
+@app.get("/api/rooms/{room_id}", response_model=RoomResponse)
+async def get_room(room_id: int, db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import select
+    result = await db.execute(select(Room).where(Room.id == room_id))
+    room = result.scalars().first()
+    if not room:
+        raise HTTPException(status_code=404, detail="Room not found")
+    return room
+
 @app.get("/api/users", response_model=List[UserResponse])
 async def get_users(db: AsyncSession = Depends(get_db)):
     from sqlalchemy import select
@@ -254,11 +294,35 @@ async def get_db_stats(db: AsyncSession = Depends(get_db)):
     from sqlalchemy import select, func
     user_result = await db.execute(select(func.count(User.id)))
     room_result = await db.execute(select(func.count(Room.id)))
+    booking_result = await db.execute(select(func.count(Booking.id)))
     return {
         "users": user_result.scalar(),
         "rooms": room_result.scalar(),
+        "bookings": booking_result.scalar(),
         "last_updated": datetime.utcnow()
     }
+
+@app.post("/api/bookings", response_model=BookingResponse)
+async def create_booking(booking: BookingCreate, db: AsyncSession = Depends(get_db)):
+    from datetime import datetime
+    new_booking = Booking(
+        user_id=booking.user_id,
+        room_id=booking.room_id,
+        check_in=datetime.fromisoformat(booking.check_in),
+        check_out=datetime.fromisoformat(booking.check_out),
+        total_price=booking.total_price,
+        status="Confirmed"
+    )
+    db.add(new_booking)
+    await db.commit()
+    await db.refresh(new_booking)
+    return new_booking
+
+@app.get("/api/bookings/user/{user_id}", response_model=List[BookingResponse])
+async def get_user_bookings(user_id: int, db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import select
+    result = await db.execute(select(Booking).where(Booking.user_id == user_id))
+    return result.scalars().all()
 
 @app.post("/api/rooms/seed")
 async def seed_rooms(db: AsyncSession = Depends(get_db)):
@@ -274,21 +338,21 @@ async def seed_rooms(db: AsyncSession = Depends(get_db)):
             room_type="Luxury Suite",
             price_per_night=1200,
             description="Ultra-luxury suite with floor-to-ceiling windows and panoramic city views.",
-            image_url="/images/suite_luxury.png"
+            image_url="/images/rooms/luxury.png"
         ),
         Room(
             name="Deluxe Ocean View",
             room_type="Deluxe Room",
             price_per_night=650,
             description="Contemporary room with a private balcony and stunning ocean vistas.",
-            image_url="/images/suite_deluxe.png"
+            image_url="/images/rooms/deluxe.png"
         ),
         Room(
             name="Royal Presidential Suite",
             room_type="Presidential Suite",
             price_per_night=2500,
             description="Grandest suite with private infinity pool and opulent marble finishings.",
-            image_url="/images/suite_presidential.png"
+            image_url="/images/rooms/royal.png"
         )
     ]
     db.add_all(rooms)
