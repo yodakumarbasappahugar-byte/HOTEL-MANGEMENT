@@ -95,7 +95,7 @@ export default function RoomsPage() {
             marginTop: '1rem', 
             marginBottom: '1.5rem', 
             fontWeight: '900', 
-            background: 'linear-gradient(to bottom, #ffffff, #94a3b8)', 
+            background: 'linear-gradient(135deg, #f0d080, #D4AF37)', 
             WebkitBackgroundClip: 'text', 
             WebkitTextFillColor: 'transparent',
             letterSpacing: '-2px'
