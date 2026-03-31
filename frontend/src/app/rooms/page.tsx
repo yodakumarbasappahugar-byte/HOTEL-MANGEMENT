@@ -207,7 +207,7 @@ export default function RoomsPage() {
                         onClick={() => router.push(`/rooms/${room.id}`)}
                         style={{ 
                           padding: '1.2rem 2.5rem', 
-                          background: 'white', 
+                          background: 'linear-gradient(135deg, #D4AF37, #a07830)', 
                           color: 'black', 
                           border: 'none', 
                           borderRadius: '16px', 
@@ -215,15 +215,17 @@ export default function RoomsPage() {
                           fontSize: '0.9rem',
                           cursor: 'pointer',
                           transition: 'all 0.3s',
-                          boxShadow: '0 10px 20px rgba(0,0,0,0.2)'
+                          boxShadow: '0 10px 20px rgba(212, 175, 55, 0.3)'
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.transform = 'scale(1.05)';
-                          e.currentTarget.style.backgroundColor = '#D4AF37';
+                          e.currentTarget.style.background = 'linear-gradient(135deg, #f0d080, #D4AF37)';
+                          e.currentTarget.style.boxShadow = '0 14px 28px rgba(212, 175, 55, 0.45)';
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.transform = 'scale(1)';
-                          e.currentTarget.style.backgroundColor = 'white';
+                          e.currentTarget.style.background = 'linear-gradient(135deg, #D4AF37, #a07830)';
+                          e.currentTarget.style.boxShadow = '0 10px 20px rgba(212, 175, 55, 0.3)';
                         }}
                       >
                         RESERVE NOW
