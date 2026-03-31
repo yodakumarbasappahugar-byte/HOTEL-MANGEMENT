@@ -314,8 +314,8 @@ async def create_booking(booking: BookingCreate, db: AsyncSession = Depends(get_
     new_booking = Booking(
         user_id=booking.user_id,
         room_id=booking.room_id,
-        check_in=datetime.fromisoformat(booking.check_in),
-        check_out=datetime.fromisoformat(booking.check_out),
+        check_in=datetime.fromisoformat(booking.check_in).replace(tzinfo=None),
+        check_out=datetime.fromisoformat(booking.check_out).replace(tzinfo=None),
         total_price=booking.total_price,
         status="Confirmed"
     )

@@ -212,24 +212,24 @@ export default function BookRoomPage() {
                 )}
 
                 <button 
-                  disabled={bookingLoading}
+                  disabled={bookingLoading || bookingSuccess}
                   style={{ 
                     width: '100%', 
                     padding: '1.5rem', 
-                    background: bookingLoading ? '#333' : '#D4AF37', 
-                    color: 'black', 
-                    border: 'none', 
+                    background: (bookingLoading || bookingSuccess) ? '#111' : '#D4AF37', 
+                    color: bookingSuccess ? '#D4AF37' : 'black', 
+                    border: bookingSuccess ? '1px solid #D4AF37' : 'none', 
                     borderRadius: '20px', 
                     fontSize: '1.1rem', 
                     fontWeight: '900', 
-                    cursor: bookingLoading ? 'not-allowed' : 'pointer',
+                    cursor: (bookingLoading || bookingSuccess) ? 'not-allowed' : 'pointer',
                     transition: 'transform 0.2s ease, opacity 0.2s ease',
                     letterSpacing: '1px'
                   }}
-                  onMouseOver={(e) => !bookingLoading && (e.currentTarget.style.transform = 'translateY(-2px)')}
-                  onMouseOut={(e) => !bookingLoading && (e.currentTarget.style.transform = 'translateY(0)')}
+                  onMouseOver={(e) => !bookingLoading && !bookingSuccess && (e.currentTarget.style.transform = 'translateY(-2px)')}
+                  onMouseOut={(e) => !bookingLoading && !bookingSuccess && (e.currentTarget.style.transform = 'translateY(0)')}
                 >
-                  {bookingLoading ? 'PROSESSING...' : 'CONFIRM RESERVATION'}
+                  {bookingLoading ? 'PROCESSING...' : bookingSuccess ? 'RESERVED ✓' : 'CONFIRM RESERVATION'}
                 </button>
               </form>
             )}
