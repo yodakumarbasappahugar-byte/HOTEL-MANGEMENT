@@ -156,11 +156,11 @@ class BookingResponse(BaseModel):
 
 app = FastAPI(title="Ayodhdya Hotel API")
 
-# Explicitly allow the user's Vercel frontend origin
 ALLOWED_ORIGINS = [
     "https://frontend-two-mocha-43.vercel.app",
     "https://hotel-management-backend-2xln.onrender.com",
     "http://localhost:3000",
+    "https://hotel-mangement-beta.vercel.app",
 ]
 
 app.add_middleware(
@@ -351,6 +351,7 @@ async def fix_image_paths(db: AsyncSession = Depends(get_db)):
 
 @app.post("/api/rooms/clear")
 async def clear_rooms(db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import delete
     await db.execute(delete(Room))
     await db.commit()
     return {"message": "All rooms cleared"}
