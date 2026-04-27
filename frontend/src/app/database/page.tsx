@@ -69,7 +69,7 @@ export default function DatabasePage() {
   return (
     <div className="container">
       <nav className="navbar">
-        <a href="/" className="logo">Ayodhdya Hotel</a>
+        <a href="/" className="logo">Empire Royal Hotel</a>
         <div className="nav-links">
           <a href="/" className="btn btn-secondary">Back to Home</a>
         </div>

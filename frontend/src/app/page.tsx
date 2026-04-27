@@ -5,14 +5,14 @@ export default function Home() {
     <>
       <Carousel />
       <nav className="navbar">
-        <div className="logo">Ayodhdya Hotel</div>
+        <div className="logo">Empire Royal Hotel</div>
         <div className="nav-links">
           {/* We can add main links here in the future */}
         </div>
       </nav>
 
       <main className="hero-container">
-        <h1>Welcome to Ayodhdya Hotel</h1>
+        <h1>Welcome to Empire Royal Hotel</h1>
         <p className="subtitle">
           Experience the finest hospitality. Manage your bookings, discover new properties, and enjoy a seamless stay with our premium hotel management platform.
         </p>

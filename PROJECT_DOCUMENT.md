@@ -1,4 +1,4 @@
-# Ayodhdya Hotel — Project Document
+# Empire Royal Hotel — Project Document
 
 > **Project Start Date**: 2026-03-23
 > **Stack**: Next.js (Vercel) + FastAPI (Render) + PostgreSQL (Neon)
@@ -68,7 +68,7 @@
 ### Step 6: Premium UI Rebranding & Carousel ✅
 **Date**: 2026-03-34
 
-- **Rebranding**: Renamed application from "LuxeStays" to "**Ayodhdya Hotel**" across all pages.
+- **Rebranding**: Renamed application from "LuxeStays" to "**Empire Royal Hotel**" across all pages.
 - **Authentication Pages**: Built custom **Sign In** and **Sign Up** pages with premium glassmorphism aesthetic.
 - **Action Buttons**: Updated all primary buttons to a sleek **Black** color scheme.
 - **Hero Carousel**: Implemented a modern, high-quality image carousel on the landing page featuring luxury hotel exteriors, suites, and infinity pools.

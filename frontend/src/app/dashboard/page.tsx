@@ -68,7 +68,7 @@ export default function Dashboard() {
       {/* ── NAV ── */}
       <nav className="db-nav">
         <a href="/" className="db-logo">
-          ✦ Ayodhdya Hotel
+          ✦ Empire Royal Hotel
         </a>
         <div className="db-nav-right">
           <span className="db-welcome">Welcome back, {user.username} 👋</span>
@@ -82,7 +82,7 @@ export default function Dashboard() {
       <section className="db-hero">
         <h1 className="db-hero-title">Your Dashboard</h1>
         <p className="db-hero-sub">
-          Manage your luxury stays and explore exclusive Ayodhdya Hotel services.
+          Manage your luxury stays and explore exclusive Empire Royal Hotel services.
         </p>
       </section>
 
@@ -165,7 +165,7 @@ export default function Dashboard() {
 
       {/* ── FOOTER ── */}
       <footer className="db-footer">
-        <p>© 2026 Ayodhdya Hotel. All rights reserved.</p>
+        <p>© 2026 Empire Royal Hotel. All rights reserved.</p>
       </footer>
     </div>
   );

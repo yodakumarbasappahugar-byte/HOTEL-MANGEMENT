@@ -66,7 +66,7 @@ export default function SignIn() {
   return (
     <>
       <nav className="navbar">
-        <a href="/" className="logo">Ayodhdya Hotel</a>
+        <a href="/" className="logo">Empire Royal Hotel</a>
         <div className="nav-links">
           <a href="/signup" className="btn btn-black" style={{ padding: '0.5rem 1.5rem', fontSize: '1rem' }}>Create Account</a>
         </div>
@@ -76,7 +76,7 @@ export default function SignIn() {
         <div className="auth-card">
           <div className="auth-header">
             <h2>Welcome Back</h2>
-            <p>Sign in to your Ayodhdya Hotel account</p>
+            <p>Sign in to your Empire Royal Hotel account</p>
           </div>
           
           <form onSubmit={handleSubmit}>

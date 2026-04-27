@@ -11,7 +11,7 @@ endpoints = [
     "/api/db-test"
 ]
 
-print(f"Testing Ayodhdya Hotel API at {base_url}...\n")
+print(f"Testing Empire Royal Hotel API at {base_url}...\n")
 
 for endpoint in endpoints:
     url = f"{base_url}{endpoint}"

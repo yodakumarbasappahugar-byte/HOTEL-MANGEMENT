@@ -154,7 +154,7 @@ class BookingResponse(BaseModel):
     class Config:
         from_attributes = True
 
-app = FastAPI(title="Ayodhdya Hotel API")
+app = FastAPI(title="Empire Royal Hotel API")
 
 ALLOWED_ORIGINS = [
     "https://frontend-two-mocha-43.vercel.app",
@@ -203,7 +203,7 @@ async def ping():
 
 @app.get("/")
 async def root():
-    return {"message": "Ayodhdya Hotel API is running"}
+    return {"message": "Empire Royal Hotel API is running"}
 
 @app.get("/api/health")
 async def health():
@@ -263,7 +263,7 @@ async def signin(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
 @app.get("/api/status")
 async def api_status():
     return {
-        "service": "Ayodhdya Hotel Backend",
+        "service": "Empire Royal Hotel Backend",
         "status": "online",
         "database": "connected"
     }

@@ -65,7 +65,7 @@ export default function SignUp() {
   return (
     <>
       <nav className="navbar">
-        <a href="/" className="logo">Ayodhdya Hotel</a>
+        <a href="/" className="logo">Empire Royal Hotel</a>
         <div className="nav-links">
           <a href="/signin" className="btn btn-secondary" style={{ padding: '0.5rem 1.5rem', fontSize: '1rem' }}>Sign In</a>
         </div>
@@ -75,7 +75,7 @@ export default function SignUp() {
         <div className="auth-card">
           <div className="auth-header">
             <h2>Create an Account</h2>
-            <p>Join Ayodhdya Hotel to unlock premium hospitality</p>
+            <p>Join Empire Royal Hotel to unlock premium hospitality</p>
           </div>
           
           <form onSubmit={handleSubmit}>

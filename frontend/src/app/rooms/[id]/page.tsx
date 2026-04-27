@@ -141,7 +141,7 @@ export default function BookRoomPage() {
         alignItems: 'center'
       }}>
         <Link href="/rooms" style={{ color: '#D4AF37', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 'bold', letterSpacing: '1px' }}>← RETURN TO SELECTION</Link>
-        <div style={{ fontSize: '1.2rem', fontWeight: '900', color: 'white', letterSpacing: '-1px' }}>AYODHDYA <span style={{ color: '#D4AF37' }}>RESERVATIONS</span></div>
+        <div style={{ fontSize: '1.2rem', fontWeight: '900', color: 'white', letterSpacing: '-1px' }}>EMPIRE ROYAL <span style={{ color: '#D4AF37' }}>RESERVATIONS</span></div>
       </nav>
 
       <main style={{ maxWidth: '1200px', margin: '6rem auto', padding: '0 5%' }}>

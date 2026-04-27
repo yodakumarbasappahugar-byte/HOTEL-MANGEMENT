@@ -63,7 +63,7 @@ export default function RoomsPage() {
           textDecoration: 'none',
           letterSpacing: '-1px'
         }}>
-          AYODHDYA <span style={{ color: 'white', fontWeight: '300' }}>HOTEL</span>
+          EMPIRE ROYAL <span style={{ color: 'white', fontWeight: '300' }}>HOTEL</span>
         </Link>
         <div style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }}>
           <Link href="/dashboard" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500', transition: 'color 0.3s' }}>DASHBOARD</Link>
@@ -245,8 +245,8 @@ export default function RoomsPage() {
         background: '#0a0a0a',
         borderTop: '1px solid rgba(255,255,255,0.05)'
       }}>
-        <div style={{ color: '#D4AF37', fontWeight: 'bold', fontSize: '1.2rem', marginBottom: '1rem' }}>AYODHDYA HOTEL</div>
-        <p style={{ color: '#64748b', fontSize: '0.9rem' }}>&copy; 2026 Ayodhdya Hotel Group. Excellence in Every Stay.</p>
+        <div style={{ color: '#D4AF37', fontWeight: 'bold', fontSize: '1.2rem', marginBottom: '1rem' }}>EMPIRE ROYAL HOTEL</div>
+        <p style={{ color: '#64748b', fontSize: '0.9rem' }}>&copy; 2026 Empire Royal Hotel Group. Excellence in Every Stay.</p>
       </footer>
 
       <style jsx global>{`
