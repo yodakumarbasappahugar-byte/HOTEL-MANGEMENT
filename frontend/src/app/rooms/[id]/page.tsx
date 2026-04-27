@@ -25,6 +25,8 @@ export default function BookRoomPage() {
   const [checkOut, setCheckOut] = useState('');
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookingDetails, setBookingDetails] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
     const fetchRoom = async () => {
@@ -45,6 +47,13 @@ export default function BookRoomPage() {
     };
 
     if (id) fetchRoom();
+
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        setCurrentUser(JSON.parse(userStr));
+      } catch (e) {}
+    }
   }, [id]);
 
   const calculateTotalPrice = () => {
@@ -90,8 +99,9 @@ export default function BookRoomPage() {
       });
 
       if (response.ok) {
+        const data = await response.json();
+        setBookingDetails(data);
         setBookingSuccess(true);
-        setTimeout(() => router.push('/dashboard'), 3000);
       } else {
         const data = await response.json();
         alert(data.detail || 'Reservation could not be processed');
@@ -172,13 +182,51 @@ export default function BookRoomPage() {
               <div style={{ fontSize: '2.5rem', fontWeight: '900' }}>${room.price_per_night} <span style={{ fontSize: '1rem', color: '#94a3b8', fontWeight: 'normal' }}>USD</span></div>
             </div>
 
-            {bookingSuccess ? (
-              <div style={{ textAlign: 'center', padding: '2rem 0', animation: 'fadeIn 0.5s ease-out' }}>
-                <div style={{ width: '80px', height: '80px', background: '#D4AF37', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem' }}>
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            {bookingSuccess && bookingDetails ? (
+              <div style={{ textAlign: 'center', animation: 'fadeIn 0.5s ease-out' }}>
+                <div style={{ width: '80px', height: '80px', background: 'rgba(212, 175, 55, 0.1)', border: '2px solid #D4AF37', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
-                <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>RESERVATION SECURED</h2>
-                <p style={{ color: '#94a3b8' }}>Redirecting to your dashboard...</p>
+                <h2 style={{ fontSize: '1.8rem', fontWeight: '900', color: '#D4AF37', marginBottom: '1rem', letterSpacing: '-0.5px' }}>RESERVATION SECURED</h2>
+                <p style={{ color: '#94a3b8', fontSize: '1.1rem', marginBottom: '2.5rem' }}>Your luxury experience awaits.</p>
+                
+                <div style={{ background: 'rgba(5, 5, 5, 0.5)', padding: '2rem', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.05)', textAlign: 'left', marginBottom: '2.5rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                    <div>
+                      <div style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.3rem', letterSpacing: '1px' }}>GUEST NAME</div>
+                      <div style={{ color: 'white', fontSize: '1.1rem', fontWeight: 'bold', textTransform: 'capitalize' }}>{currentUser?.username || 'Guest'}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.3rem', letterSpacing: '1px' }}>EMAIL</div>
+                      <div style={{ color: 'white', fontSize: '1.1rem', fontWeight: 'bold', wordBreak: 'break-all' }}>{currentUser?.email || ''}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.3rem', letterSpacing: '1px' }}>BOOKING REF</div>
+                      <div style={{ color: 'white', fontSize: '1.1rem', fontWeight: 'bold' }}>#{bookingDetails.id}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.3rem', letterSpacing: '1px' }}>TOTAL PAID</div>
+                      <div style={{ color: '#D4AF37', fontSize: '1.2rem', fontWeight: '900' }}>${bookingDetails.total_price}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.3rem', letterSpacing: '1px' }}>CHECK-IN</div>
+                      <div style={{ color: 'white', fontSize: '1rem' }}>{new Date(bookingDetails.check_in).toLocaleDateString()}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.3rem', letterSpacing: '1px' }}>CHECK-OUT</div>
+                      <div style={{ color: 'white', fontSize: '1rem' }}>{new Date(bookingDetails.check_out).toLocaleDateString()}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <button onClick={() => router.push('/dashboard')} style={{ width: '100%', padding: '1.2rem', background: '#D4AF37', color: 'black', border: 'none', borderRadius: '15px', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', transition: 'transform 0.2s', letterSpacing: '1px' }}>
+                    VIEW MY DASHBOARD
+                  </button>
+                  <button onClick={() => router.push('/rooms')} style={{ width: '100%', padding: '1.2rem', background: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '15px', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', transition: 'background 0.2s', letterSpacing: '1px' }}>
+                    EXPLORE MORE SUITES
+                  </button>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleBooking}>
